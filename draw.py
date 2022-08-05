@@ -112,9 +112,12 @@ class Game:
 
     def update(self, status):
         count = 0
+
         if status == 'up':
-            for j in range(self.num):
-                for i in range(self.num - 1):
+            j = 0
+            while j < self.num:
+                i = 0
+                while i < self.num - 1:
                     k = i + 1
                     while k < self.num:
                         if not self.numbers_list[i][j]:
@@ -122,6 +125,7 @@ class Game:
                                 self.numbers_list[i][j], self.numbers_list[k][j] = self.numbers_list[k][j], None
                                 self.numbers_list[i][j].set_new_center(self.coordinate_list[i][j])
                                 count += 1
+                                i -= 1
                                 break
                             else:
                                 k += 1
@@ -136,9 +140,14 @@ class Game:
                                     break
                                 else:
                                     break
+                    i += 1
+                j += 1
+
         if status == 'down':
-            for j in range(self.num - 1, -1, -1):
-                for i in range(self.num - 1, 0, -1):
+            j = self.num - 1
+            while j >= 0:
+                i = self.num - 1
+                while i > 0:
                     k = i - 1
                     while k >= 0:
                         if not self.numbers_list[i][j]:
@@ -146,6 +155,7 @@ class Game:
                                 self.numbers_list[i][j], self.numbers_list[k][j] = self.numbers_list[k][j], None
                                 self.numbers_list[i][j].set_new_center(self.coordinate_list[i][j])
                                 count += 1
+                                i += 1
                                 break
                             else:
                                 k -= 1
@@ -160,9 +170,14 @@ class Game:
                                     break
                                 else:
                                     break
+                    i -= 1
+                j -= 1
+
         if status == 'left':
-            for i in range(self.num):
-                for j in range(self.num - 1):
+            i = 0
+            while i < self.num:
+                j = 0
+                while j < self.num - 1:
                     k = j + 1
                     while k < self.num:
                         if not self.numbers_list[i][j]:
@@ -170,6 +185,7 @@ class Game:
                                 self.numbers_list[i][j], self.numbers_list[i][k] = self.numbers_list[i][k], None
                                 self.numbers_list[i][j].set_new_center(self.coordinate_list[i][j])
                                 count += 1
+                                j -= 1
                                 break
                             else:
                                 k += 1
@@ -184,9 +200,14 @@ class Game:
                                     break
                                 else:
                                     break
+                    j += 1
+                i += 1
+
         if status == 'right':
-            for i in range(self.num - 1, -1, -1):
-                for j in range(self.num - 1, 0, -1):
+            i = self.num - 1
+            while i >= 0:
+                j = self.num - 1
+                while j > 0:
                     k = j - 1
                     while k >= 0:
                         if not self.numbers_list[i][j]:
@@ -194,6 +215,7 @@ class Game:
                                 self.numbers_list[i][j], self.numbers_list[i][k] = self.numbers_list[i][k], None
                                 self.numbers_list[i][j].set_new_center(self.coordinate_list[i][j])
                                 count += 1
+                                j += 1
                                 break
                             else:
                                 k -= 1
@@ -208,6 +230,8 @@ class Game:
                                     break
                                 else:
                                     break
+                    j -= 1
+                i -= 1
 
         if count == 0:
             return
@@ -221,8 +245,6 @@ class Game:
                     inds.append([i, j])
                 j += 1
             i += 1
-
-        print(len(inds))
 
         ind = random.choice(inds)
         i, j = ind[0], ind[1]
