@@ -21,6 +21,7 @@ Arcade >= 2.6.15\
 |  \
 |-- components \
 |&ensp;|-- \_\_init__.py \
+|&ensp;|-- button.py &emsp;&emsp;&emsp; 按钮，存放按钮相关信息 \
 |&ensp;|-- number.py &emsp;&emsp;&emsp; 数字块，存放数字信息以及位置信息 \
 |  \
 |-- core \

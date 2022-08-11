@@ -1,6 +1,5 @@
 from position import Position
-from graphics import Rectangle
-from graphics import Text
+from graphics import Rectangle, Text
 
 
 class Number:

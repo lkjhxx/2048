@@ -3,7 +3,7 @@ import arcade
 from animate import AnimateList
 from graphics import Text
 from position import Position
-from components import Number
+from components import Button, Number
 
 
 class MyGame(arcade.Window):
@@ -12,21 +12,18 @@ class MyGame(arcade.Window):
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.animate_list = AnimateList()
-        self.open_menu = False
-        self.game_loop = GameLoop(self.screen_width, self.screen_height, arcade.color.YELLOW_ORANGE, self.animate_list)
+        self.button_manager = ButtonManager()
+        self.game_loop = GameLoop(self.screen_width, self.screen_height, arcade.color.YELLOW_ORANGE)
+        self._start()
 
     def on_draw(self):
         arcade.start_render()
-        if not self.animate_list.is_empty():
-            self.animate_list.draw()
-        else:
-            if self.game_loop.get_should_add_number():
-                self.game_loop.add_number()
         self.game_loop.draw()
+        if self.game_loop.is_game_over():
+            self.button_manager.draw('Restart')
 
     def on_key_press(self, symbol: int, modifiers: int):
-        if not self.game_loop.is_game_over() and self.animate_list.is_empty():
+        if not self.game_loop.is_game_over() and self.game_loop.is_animate_list_empty():
             if symbol == arcade.key.UP:
                 self.game_loop.update(status='up')
             if symbol == arcade.key.DOWN:
@@ -36,12 +33,25 @@ class MyGame(arcade.Window):
             if symbol == arcade.key.RIGHT:
                 self.game_loop.update(status='right')
 
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if self.game_loop.is_game_over():
+            if self.button_manager.get_button('Restart').is_in_area(x, y):
+                self.game_loop = GameLoop(self.screen_width, self.screen_height, arcade.color.YELLOW_ORANGE)
+
+    def _start(self):
+        self._add_button()
+
+    def _add_button(self):
+        self.button_manager.add_button(position=Position([self.screen_width - 300, self.screen_width - 30,
+                                                          300, 380]),
+                                       color=arcade.color.CEIL,
+                                       name='Restart')
+
 
 class GameLoop:
-    def __init__(self, screen_width, screen_height, color, animate_list, num=4, half_width=40):
+    def __init__(self, screen_width, screen_height, color, num=4, half_width=40):
         self.num = num
         self.center_point_list = self._get_coordinate_list(screen_width, screen_height, num)
-        self.animate_list = animate_list
         self.color = color
         self.half_width = half_width
         self.numbers_list = [[None] * num for _ in range(num)]
@@ -54,6 +64,7 @@ class GameLoop:
         self.game_over_text = Text(position=Position([screen_width - 300, screen_width, 400, screen_height]),
                                    text='Game Over',
                                    font_size=40)
+        self.animate_list = AnimateList()
         self.start()
 
     def _get_coordinate_list(self, screen_width, screen_height, num):
@@ -227,7 +238,7 @@ class GameLoop:
         self.score_text.set_text('Score: ' + str(self.score))
         self.should_add_number = True
 
-    def add_number(self):
+    def _add_number(self):
         inds = []
         i = 0
         while i < self.num:
@@ -247,7 +258,7 @@ class GameLoop:
         if len(inds) == 1:
             self._is_game_over()
 
-    def get_should_add_number(self):
+    def _get_should_add_number(self):
         return self.should_add_number
 
     def is_game_over(self):
@@ -274,6 +285,14 @@ class GameLoop:
         return right and down
 
     def draw(self):
+        if not self.animate_list.is_empty():
+            self.animate_list.draw()
+        else:
+            if self._get_should_add_number():
+                self._add_number()
+        self._draw_static_number()
+
+    def _draw_static_number(self):
         for nums in self.numbers_list:
             for num in nums:
                 if num:
@@ -283,3 +302,20 @@ class GameLoop:
 
         if self.game_over:
             self.game_over_text.draw()
+
+    def is_animate_list_empty(self):
+        return self.animate_list.is_empty()
+
+
+class ButtonManager:
+    def __init__(self):
+        self.buttons = dict()
+
+    def add_button(self, position, color, name):
+        self.buttons[name] = Button(position, color, name)
+
+    def get_button(self, name):
+        return self.buttons[name]
+
+    def draw(self, name):
+        self.buttons[name].draw()
